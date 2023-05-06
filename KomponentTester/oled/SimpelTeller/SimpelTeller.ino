@@ -14,26 +14,43 @@
 #define OLED_CS     10
 #define OLED_RESET  9
 
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, OLED_DC, OLED_RESET, OLED_CS); // gir oss et display objekt med riktige rammer
+
+// gir oss et Display objekt med riktige rammer, som heter display.
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &SPI, OLED_DC, OLED_RESET, OLED_CS); 
+
+
+
+int teller = 0; //tid takeren vår for telleren. 
 
 void setup() {
   Serial.begin(9600);
 
   setupSkjerm(); // setup kommandoer konsolidert...
 
-
   display.setTextColor(WHITE); // NØDVENDIG: vi må definere textfargen (selv om den kun har en farge, (og er blå.......))
-  display.setTextSize(3); // ikke nødvendig. Standard er minste størrelse 0.
-  display.setCursor(0, 10); //ikke nødvendig. Velger hvor vi starter å skrive i kordinat systemet, standard er 0, 0. 
-  display.println("Super"); // print "Super" + \n (linjeskift, defor Super og Circuit er på forskeligge linjer)
-  display.println("Circuit");
+  display.setTextSize(2); // ikke nødvendig. Standard er minste størrelse 0.
 
-  
-  display.display(); // oppdater innholdet på skjermen. 
 
 }
 
-void loop(){}
+
+void loop(){
+
+
+  display.clearDisplay(); // fjern alt innhold fra forrige loop. Skjermen er nå svart
+
+  display.setCursor(0, 0); // Velger hvor vi starter å skrive i kordinat systemet, standard er 0, 0. Om vi ikke definerer dette hver loop, vil teksten "forstette å skrive" fra der forrige tekst avsluttet. 
+  
+  // i arduino kan vi ikke konkatinere, dermed skriver vi uten linjeskift. 
+  display.print("Teller:");
+  display.print(teller); // skriver ut verdien av teller 
+
+  display.display(); // oppdater skjermen med det vi definerete over. 
+
+  delay(1000); // vent 1 sek
+  teller++; // oek teller med 1. 
+
+}
 
 
 
