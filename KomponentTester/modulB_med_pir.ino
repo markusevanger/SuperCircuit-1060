@@ -19,15 +19,14 @@ int calibrationTime = 30;
 // MAC Addresse til receiver 
 uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xE5, 0x51, 0x9F};
 //E0:98:06:05:ED:C6 = MED FLEKK
-//10:52:1C:E5:51:9F = UTEN FLEKk
+//10:52:1C:E5:51:9F = UTEN FLEKK
 
 // Definer en data struktur
 typedef struct structMessage {
-  int signal = 0;  // signal som sendes for å starte klokke.
+  int signal = 1;  // signal som sendes for å starte klokke.
 };
 // Lag et strukturert objekt
 structMessage myData;
-int counter = 0;
 
 // Callback when data is sent
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
@@ -97,7 +96,6 @@ void wifiSetup() {
   esp_now_register_send_cb(OnDataSent);
   // Register peer
   esp_now_add_peer(broadcastAddress, ESP_NOW_ROLE_COMBO, 1, NULL, 0);
-
 }
 
 void sendWifiSignal() {
