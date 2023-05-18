@@ -53,6 +53,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print(len);
   Serial.print(myData.signal);
   Serial.print(" === START TIMER  ");
+  elapsedTime = 0;
   startSignal = true;
 } 
 
@@ -63,10 +64,13 @@ void oledSetup() {
     Serial.println(F("SSD1306 allocation failed")); 
     for(;;); // Don't proceed, loop forever
   }
-  // ^^^^^^^^^^^^^^ idk ka dette gjør........ -markus
   display.clearDisplay(); // fjenrer det som var på skjermen før.
   display.setTextColor(WHITE); // NØDVENDIG: vi må definere textfargen (selv om den kun har en farge, (og er blå.......))
-  display.setTextSize(3); // Vertical size (y-axis)
+  display.setTextSize(3);
+
+  display.print(" SUPER ");
+  display.print("CIRCUIT");
+  display.display(); // oppdater skjermen med det vi definerete over. 
 }
 
 
@@ -84,7 +88,6 @@ void pirLoop() {
   }
   else {
     pirState = LOW;
-    Serial.println("Motion Ended");
   }
 }
 
