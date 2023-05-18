@@ -25,26 +25,17 @@ String minString;
 String sekString;
 String milString;
 String tellerString;
-bool started = false;
 
 
     // PIR CODE SETUP:
-int ledPin = 13; // choose the pin for the LED
-int inputPin = 2; // choose the input pin (for PIR sensor)
-int pirState = true; // we start, assuming no motion detected
+int inputPin = D4; // choose the input pin (for PIR sensor)
+int pirState = LOW; // we start, assuming no motion detected
 int val = 0; // variable for reading the pin status
-int minimummSecsLowForInactive = 5000; // If the sensor reports low for
-// more than this time, then assume no activity
-long unsigned int timeLow;
-boolean takeLowTime;
- 
-//the time we give the sensor to calibrate (10-60 secs according to the datasheet)
-int calibrationTime = 30;
 
 
     // P2P COMMUNICATION SETUP:
 // MAC Addresse til receiver 
-  uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xE5, 0x51, 0x9F};
+  uint8_t broadcastAddress[] = {0xE0, 0x98, 0x06, 0x05, 0xED, 0xC6};
 //E0:98:06:05:ED:C6 = MED FLEKK
 //10:52:1C:E5:51:9F = UTEN FLEKk
 
@@ -53,15 +44,16 @@ typedef struct structMessage {
 };
 
 structMessage myData;
-
+bool startSignal = false;
 
 // Callback when data is received
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   memcpy(&myData, incomingData, sizeof(myData));
   Serial.print("Bytes received: ");
-  Serial.println(len);
-  Serial.println(myData.signal);
-  Serial.print(" === START TIMER");
+  Serial.print(len);
+  Serial.print(myData.signal);
+  Serial.print(" === START TIMER  ");
+  startSignal = true;
 } 
 
 
@@ -77,16 +69,36 @@ void oledSetup() {
   display.setTextSize(3); // Vertical size (y-axis)
 }
 
-void oledLoop() {
+
+void pirSetup() {
+  pinMode(inputPin, INPUT);
+}
+
+void pirLoop() {
+  val = digitalRead(inputPin);
+  if (val == HIGH) {
+
+    startSignal = false;
+    Serial.println("Motion detected!");
+    delay(1000);
+  }
+  else {
+    pirState = LOW;
+    Serial.println("Motion Ended");
+  }
+}
+
+
+void startLoop() {
   display.clearDisplay(); // fjern alt innhold fra forrige loop. Skjermen er nå svart
   display.setCursor(0, 0); // Velger hvor vi starter å skrive i kordinat systemet, standard er 0, 0. Om vi ikke definerer dette hver loop, vil teksten "forstette å skrive" fra der forrige tekst avsluttet. 
   // i arduino kan vi ikke konkatinere, dermed skriver vi uten linjeskift. 
- 
+
   oppdaterTeller();
   tellerString = minString + ":" + sekString + ":" + milString;
   display.print(tellerString); 
   display.display(); // oppdater skjermen med det vi definerete over. 
-  delay(100); // vent 1 sek
+  delay(100); // vent 1 millisekund. /// BRUKE MILLIS()????
 }
 
 void oppdaterTeller() {
@@ -94,59 +106,10 @@ void oppdaterTeller() {
   unsigned long minTeller = (elapsedTime / 60000) % 60;
   unsigned long sekTeller = (elapsedTime / 1000) % 60;
   unsigned long milTeller = elapsedTime % 1000;
-  Serial.println(sekTeller);
 
   minString = String(minTeller);
   sekString = (sekTeller < 10) ? "0" + String(sekTeller) : String(sekTeller);
   milString = "0" + String(milTeller / 100);
-  
-}
-
-
-void pirSetup() {
-  pinMode(ledPin, OUTPUT);
-  pinMode(inputPin, INPUT);
-  
-  //give the sensor some time to calibrate
-  Serial.print("calibrating sensor ");
-  for(int i = 0; i < calibrationTime; i++){
-    Serial.print(".");
-    delay(1000);
-  }
-  Serial.println(" done");
-  Serial.println("SENSOR ACTIVE");
-  delay(50);
-}
-
-void pirLoop() {
-  val = digitalRead(inputPin);
-  if (val == HIGH) {
-    digitalWrite(ledPin, HIGH);
-
-
-    // Her skal timeren stoppe og resultat vises på skjerm.
-    Serial.println("Timer stopped");
-
-
-    if (pirState) {
-      pirState = false;
-      Serial.println("Motion detected!");
-      delay(10000);
-    }
-    takeLowTime = true;
-  }
-  else {
-    digitalWrite(ledPin, LOW);
-    if (takeLowTime) {
-      timeLow = millis();
-      takeLowTime = false;
-    }
-    if (!pirState && millis() - timeLow > minimummSecsLowForInactive) {
-      pirState = true;
-      Serial.println("Motion ended!");
-      delay(50);
-    }
-  }
 }
 
 
@@ -170,12 +133,14 @@ void wifiSetup() {
 
 void setup() {
   Serial.begin(9600);
-  //pirSetup();
+  pirSetup();
   wifiSetup();
   oledSetup();
 }
  
 void loop() {
-  //pirLoop();
-  oledLoop();
+  pirLoop();
+  if (startSignal) {
+    startLoop();
+  }
 }
