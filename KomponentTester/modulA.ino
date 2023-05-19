@@ -84,7 +84,9 @@ void pirLoop() {
 
     startSignal = false;
     Serial.println("Motion detected!");
+    tone(D6, 241);
     delay(1000);
+    noTone(D6);
   }
   else {
     pirState = LOW;
@@ -139,6 +141,7 @@ void setup() {
   pirSetup();
   wifiSetup();
   oledSetup();
+  pinMode(D6, OUTPUT);  //PIEZO
 }
  
 void loop() {
