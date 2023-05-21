@@ -72,7 +72,6 @@ void wifiSetup() {
 }
  
 void setup() {
-  // Init Serial Monitor
   Serial.begin(9600);
   pirSetup();
   wifiSetup();
