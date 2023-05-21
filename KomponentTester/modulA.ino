@@ -65,7 +65,7 @@ void oledSetup() {
     for(;;); // Don't proceed, loop forever
   }
   display.clearDisplay(); // fjenrer det som var på skjermen før.
-  display.setTextColor(WHITE); // NØDVENDIG: vi må definere textfargen (selv om den kun har en farge, (og er blå.......))
+  display.setTextColor(WHITE); // vi må definere textfargen
   display.setTextSize(3);
 
   display.print(" SUPER ");
@@ -96,18 +96,20 @@ void pirLoop() {
 
 void startLoop() {
   display.clearDisplay(); // fjern alt innhold fra forrige loop. Skjermen er nå svart
-  display.setCursor(0, 0); // Velger hvor vi starter å skrive i kordinat systemet, standard er 0, 0. Om vi ikke definerer dette hver loop, vil teksten "forstette å skrive" fra der forrige tekst avsluttet. 
+  display.setCursor(0, 0); // Velger hvor vi starter å skrive i kordinat systemet,
+  // standard er 0, 0. Om vi ikke definerer dette hver loop, vil teksten
+  // "forstette å skrive" fra der forrige tekst avsluttet. 
   // i arduino kan vi ikke konkatinere, dermed skriver vi uten linjeskift. 
 
   oppdaterTeller();
   tellerString = minString + ":" + sekString + ":" + milString;
   display.print(tellerString); 
   display.display(); // oppdater skjermen med det vi definerete over. 
-  delay(100); // vent 1 millisekund. /// BRUKE MILLIS()????
+  delay(100); // vent 1 millisekund.
 }
 
 void oppdaterTeller() {
-  elapsedTime += 100;  // Increment elapsed time by 100 milliseconds
+  elapsedTime += 100;  // øk tid med 100 millisekunder
   unsigned long minTeller = (elapsedTime / 60000) % 60;
   unsigned long sekTeller = (elapsedTime / 1000) % 60;
   unsigned long milTeller = elapsedTime % 1000;
