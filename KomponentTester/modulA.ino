@@ -25,6 +25,7 @@ String minString;
 String sekString;
 String milString;
 String tellerString;
+String forrigeString = "";
 
 
     // PIR CODE SETUP:
@@ -53,6 +54,7 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print(len);
   Serial.print(myData.signal);
   Serial.print(" === START TIMER  ");
+  forrigeString = minString + ":" + sekString + ":" + milString;
   elapsedTime = 0;
   startSignal = true;
 } 
@@ -68,8 +70,8 @@ void oledSetup() {
   display.setTextColor(WHITE); // vi må definere textfargen
   display.setTextSize(3);
 
-  display.print(" SUPER ");
-  display.print("CIRCUIT");
+  display.print("MOTION ");
+  display.print("FINISH");
   display.display(); // oppdater skjermen med det vi definerete over. 
 }
 
@@ -81,10 +83,9 @@ void pirSetup() {
 void pirLoop() {
   val = digitalRead(inputPin);
   if (val == HIGH) {
-
     startSignal = false;
     Serial.println("Motion detected!");
-    tone(D6, 241);
+    tone(D6, 440);
     delay(1000);
     noTone(D6);
   }
@@ -103,9 +104,14 @@ void startLoop() {
 
   oppdaterTeller();
   tellerString = minString + ":" + sekString + ":" + milString;
-  display.print(tellerString); 
+
+  display.setTextSize(3);
+  display.print(tellerString);
+  display.setCursor(20,40);
+  display.setTextSize(2);
+  display.println(forrigeString);
   display.display(); // oppdater skjermen med det vi definerete over. 
-  delay(100); // vent 1 millisekund.
+  delay(100); // ventS 1 millisekund.
 }
 
 void oppdaterTeller() {
@@ -137,7 +143,7 @@ void wifiSetup() {
   esp_now_register_recv_cb(OnDataRecv);
 }
  
-
+ 
 void setup() {
   Serial.begin(9600);
   pirSetup();
