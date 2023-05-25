@@ -59,7 +59,8 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print(len);
   Serial.print(myData.signal);
   Serial.print(" === START TIMER  ");
-    
+   
+  // lagrer forrigeString som den forrige elapsedTime strenger:
   forrigeString = minString + ":" + sekString + ":" + milString;
   forrigeTime = elapsedTime; // tar vare på forrige elapsedTime
   elapsedTime = 0; // restarter timer
