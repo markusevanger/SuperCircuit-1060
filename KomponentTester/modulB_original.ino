@@ -90,6 +90,7 @@ void pirSetup() {
 void pirLoop() {
   val = digitalRead(inputPin);
   if (val == HIGH) {
+    // MENS MOTION ER MERKET
     Serial.println("Motion detected!");
     startSignal = false; // stopper timeren
     piezoBuzz(); // bestemmer hvilken lyd vi vil spille av
