@@ -25,27 +25,32 @@ String minString;
 String sekString;
 String milString;
 String tellerString;
+unsigned long forrigeTime = 0;
 String forrigeString = "";
 
 
     // PIR CODE SETUP:
-int inputPin = D4; // choose the input pin (for PIR sensor)
-int pirState = LOW; // we start, assuming no motion detected
-int val = 0; // variable for reading the pin status
+int inputPin = D4; // velg pin for PIR 
+int pirState = LOW; // vi starter, og antar at motion ikke er merket
+int val = 0; // variabel for  å lese pin status
+    // PIEZO CODE SETUP:
+int c = 523; // frekvens for noten C
+int g = 415; // frekvens for noten G#
+int a = 466; // frekvens for noten A#
 
 
     // P2P COMMUNICATION SETUP:
 // MAC Addresse til receiver 
   uint8_t broadcastAddress[] = {0xE0, 0x98, 0x06, 0x05, 0xED, 0xC6};
-//E0:98:06:05:ED:C6 = MED FLEKK
-//10:52:1C:E5:51:9F = UTEN FLEKk
+//E0:98:06:05:ED:C6 = Boardet MED flekk på siden
+//10:52:1C:E5:51:9F = Boardet UTEN flekk på siden
 
 typedef struct structMessage {
   int signal; 
 };
 
 structMessage myData;
-bool startSignal = false;
+bool startSignal = false; // start signal for opptelling 
 
 // Callback when data is received
 void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
@@ -54,9 +59,11 @@ void OnDataRecv(uint8_t * mac, uint8_t *incomingData, uint8_t len) {
   Serial.print(len);
   Serial.print(myData.signal);
   Serial.print(" === START TIMER  ");
+    
   forrigeString = minString + ":" + sekString + ":" + milString;
-  elapsedTime = 0;
-  startSignal = true;
+  forrigeTime = elapsedTime; // tar vare på forrige elapsedTime
+  elapsedTime = 0; // restarter timer
+  startSignal = true; // starter opptelling
 } 
 
 
@@ -83,14 +90,58 @@ void pirSetup() {
 void pirLoop() {
   val = digitalRead(inputPin);
   if (val == HIGH) {
-    startSignal = false;
     Serial.println("Motion detected!");
-    tone(D6, 440);
-    delay(1000);
-    noTone(D6);
+    startSignal = false; // stopper timeren
+    piezoBuzz(); // bestemmer hvilken lyd vi vil spille av
   }
   else {
     pirState = LOW;
+  }
+}
+
+void piezoBuzz() {
+  if (elapsedTime < forrigeTime) {
+    tone(D6, c);
+    delay(50);
+    noTone(D6);
+    delay(50);
+
+    tone(D6, c);
+    delay(50);
+    noTone(D6);
+    delay(50);
+
+    tone(D6, c);
+    delay(50);
+    noTone(D6);
+    delay(50);
+
+    tone(D6, c);
+    delay(250);
+    noTone(D6);
+    delay(50);
+
+    tone(D6, g);
+    delay(300);    
+
+    tone(D6, a);
+    delay(300);    
+
+    tone(D6, c);
+    delay(100);
+    noTone(D6);
+    delay(100);
+
+    tone(D6, a);
+    delay(100);    
+
+    tone(D6, c);
+    delay(300);
+    noTone(D6);
+  } else {
+    tone(D6, 440);
+    delay(1000);
+    noTone(D6);
   }
 }
 
@@ -102,8 +153,7 @@ void startLoop() {
   // "forstette å skrive" fra der forrige tekst avsluttet. 
   // i arduino kan vi ikke konkatinere, dermed skriver vi uten linjeskift. 
 
-  oppdaterTeller();
-  tellerString = minString + ":" + sekString + ":" + milString;
+  oppdaterTeller(); // setter nye verdier for timer variablene
 
   display.setTextSize(3);
   display.print(tellerString);
@@ -111,11 +161,11 @@ void startLoop() {
   display.setTextSize(2);
   display.println(forrigeString);
   display.display(); // oppdater skjermen med det vi definerete over. 
-  delay(100); // ventS 1 millisekund.
+  delay(100); // venter 1 millisekund.
 }
 
 void oppdaterTeller() {
-  elapsedTime += 100;  // øk tid med 100 millisekunder
+  elapsedTime += 100;  // øk total tid med 100 millisekunder
   unsigned long minTeller = (elapsedTime / 60000) % 60;
   unsigned long sekTeller = (elapsedTime / 1000) % 60;
   unsigned long milTeller = elapsedTime % 1000;
@@ -123,6 +173,7 @@ void oppdaterTeller() {
   minString = String(minTeller);
   sekString = (sekTeller < 10) ? "0" + String(sekTeller) : String(sekTeller);
   milString = "0" + String(milTeller / 100);
+  tellerString = minString + ":" + sekString + ":" + milString;
 }
 
 
