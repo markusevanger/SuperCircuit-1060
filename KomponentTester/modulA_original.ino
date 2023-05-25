@@ -1,10 +1,12 @@
 #include <ESP8266WiFi.h>
 #include <espnow.h>
 
-    // PIR CODE SETUP:
-int inputPin = D5;               // choose the input pin (for PIR sensor)
-int pirState = LOW;             // we start, assuming no motion detected
-int val = 0;                    // variable for reading the pin status
+// PIR CODE SETUP:
+int inputPin = D5; // vel pin for PIR
+int pirState = LOW; // vi starter, og antar at motion ikke er merket
+int val = 0; // variabel for å lese pin status
+    // PIEZO CODE SETUP
+int b = 720; // frekvens for noten B
 
 
     // P2P COMMUNICATION SETUP:
@@ -17,7 +19,7 @@ uint8_t broadcastAddress[] = {0x10, 0x52, 0x1C, 0xE5, 0x51, 0x9F};
 typedef struct structMessage {
   int signal = 1;  // signal som sendes for å starte klokke.
 };
-// Lag et strukturert objekt
+
 structMessage myData;
 
 // Callback when data is sent
@@ -36,20 +38,19 @@ void pirSetup() {
 }
 
 void pirLoop() {
-  val = digitalRead(inputPin);  // read input value
-  if (val == HIGH) {            // check if the input is HIGH
-    
-    // MENS DEN ER HIGH
-    esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-    
+  val = digitalRead(inputPin);
+  if (val == HIGH) {
+    // MENS MOTION ER MERKET
     Serial.println("Motion detected!");
-    delay(10000);
+    esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+
+    tone(D6, b);
+    delay(1000);
+    noTone(D6);
+    delay(9000);
+      
   } else {  
-    // we have just turned of
-    Serial.println("Motion ended!");
-    // We only want to print on the output change, not state
     pirState = LOW;
-  
   }
 }
 
@@ -75,6 +76,7 @@ void setup() {
   Serial.begin(9600);
   pirSetup();
   wifiSetup();
+  pinMode(D6, OUTPUT); // PIEZO
 }
  
 void loop() {
