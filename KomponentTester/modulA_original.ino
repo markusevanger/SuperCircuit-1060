@@ -42,8 +42,9 @@ void pirLoop() {
   if (val == HIGH) {
     // MENS MOTION ER MERKET
     Serial.println("Motion detected!");
-    esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-
+    // Sender WiFi signal:
+    esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData)); 
+    // Spiller av lyd
     tone(D6, b);
     delay(1000);
     noTone(D6);
