@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <espnow.h>
 
-// PIR CODE SETUP:
+    // PIR CODE SETUP:
 int inputPin = D5; // vel pin for PIR
 int pirState = LOW; // vi starter, og antar at motion ikke er merket
 int val = 0; // variabel for å lese pin status
