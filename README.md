@@ -4,7 +4,7 @@
 
 # 👑 Velkommen til den beste gruppa på ifi! 👑
 
-IN1060 er et fag på UiO som går ut på å gjøre bruker undersøkelser med mål om å lage en prototype med arduino i sentrum. Her finner du all kode vi har brukt underveis og som kjører på vår arduino! Foreløpig mangler det dokumentasjon på hvilke biblioteker vi bruker, men det kommer ASAP!
+IN1060 er et fag på UiO som går ut på å gjøre bruker undersøkelser med mål om å lage en prototype med arduino i sentrum. Her finner du all kode vi har brukt underveis og som kjører på vår arduino!
 
 🦧 Les mer om gruppen vår her: https://www.uio.no/studier/emner/matnat/ifi/IN1060/v23/prosjekter-var-2023/super-circut/
 
